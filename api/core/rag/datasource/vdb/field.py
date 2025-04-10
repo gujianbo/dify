@@ -3,6 +3,7 @@ from enum import Enum
 
 class Field(Enum):
     CONTENT_KEY = "page_content"
+    CONTENT_KEY_TOKEN = "page_content_token"
     METADATA_KEY = "metadata"
     GROUP_KEY = "group_id"
     VECTOR = "vector"
