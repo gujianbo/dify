@@ -10,6 +10,7 @@ ENV POETRY_VERSION=2.0.1
 # RUN pip install --no-cache-dir poetry==${POETRY_VERSION} -i https://mirrors.aliyun.com/pypi/simple/
 
 RUN pip install --no-cache-dir poetry==${POETRY_VERSION}
+RUN pip install jieba
 
 # Configure Poetry
 ENV POETRY_CACHE_DIR=/tmp/poetry_cache
