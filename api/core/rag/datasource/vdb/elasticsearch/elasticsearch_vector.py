@@ -17,10 +17,9 @@ from core.rag.embedding.embedding_base import Embeddings
 from core.rag.models.document import Document
 from extensions.ext_redis import redis_client
 from models.dataset import Dataset
-from common.tokenizer import tokenizer
+from models.tokenizer import tokenizer
 
 logger = logging.getLogger(__name__)
-
 
 class ElasticSearchConfig(BaseModel):
     host: str
@@ -84,12 +83,13 @@ class ElasticSearchVector(BaseVector):
         uuids = self._get_uuids(documents)
         for i in range(len(documents)):
             query_tks = tokenizer.tokenize(documents[i].page_content)
+            page_content_str = " ".join(query_tks)
             self._client.index(
                 index=self._collection_name,
                 id=uuids[i],
                 document={
                     Field.CONTENT_KEY.value: documents[i].page_content,
-                    Field.CONTENT_KEY_TOKEN: query_tks,
+                    Field.CONTENT_KEY_TOKEN.value: page_content_str,
                     Field.VECTOR.value: embeddings[i] or None,
                     Field.METADATA_KEY.value: documents[i].metadata or {},
                 },
@@ -152,7 +152,8 @@ class ElasticSearchVector(BaseVector):
     def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
         # query_str = {"match": {Field.CONTENT_KEY.value: query}}
         query_tks = tokenizer.tokenize(query)
-        query_str = {"match": {Field.CONTENT_KEY_TOKEN.value: query_tks}}
+        page_content_str = " ".join(query_tks)
+        query_str = {"match": {Field.CONTENT_KEY_TOKEN.value: page_content_str}}
         document_ids_filter = kwargs.get("document_ids_filter")
         if document_ids_filter:
             query_str["filter"] = {"terms": {"metadata.document_id": document_ids_filter}}  # type: ignore

@@ -10,17 +10,17 @@ class Tokenizer:
     def extract_pattern(self, text):
         matches = []
         for pattern in self.patterns:
-            print(pattern)
+            # print(pattern)
             for match in re.finditer(pattern, text):
                 matches.append((match.start(), match.end(), match.group(0)))
-                print(match)
+                # print(match)
         sorted_matches = sorted(matches, key=lambda x: x[0])
         return sorted_matches
 
     def tokenize(self, words):
-        print(words)
+        # print(words)
         matches = self.extract_pattern(words)
-        print(matches)
+        # print(matches)
         segmentation = jieba.tokenize(words, mode="search")
         if len(matches) == 0:
             return " ".join([x[0] for x in segmentation])
@@ -50,7 +50,7 @@ class Tokenizer:
 
 tokenizer = Tokenizer()
 
-if __name__ == "__main__":
-    tokenizer = Tokenizer()
-    t = tokenizer.tokenize("示例字符串如9.1.1.a、2.b.c，或x.y.z a1.bdsaf2.")
-    print(t)
+# if __name__ == "__main__":
+#     tokenizer = Tokenizer()
+#     t = tokenizer.tokenize("示例字符串如9.1.1.a、2.b.c，或x.y.z a1.bdsaf2.")
+#     print(" ".join(t))
