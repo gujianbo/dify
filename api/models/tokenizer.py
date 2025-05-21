@@ -23,7 +23,7 @@ class Tokenizer:
         # print(matches)
         segmentation = jieba.tokenize(words, mode="search")
         if len(matches) == 0:
-            return " ".join([x[0] for x in segmentation])
+            return [x[0] for x in segmentation]
         new_seg = []
         m_idx = 0
         for tk in segmentation:
