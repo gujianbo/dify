@@ -7,6 +7,7 @@ WORKDIR /app/api
 ENV UV_VERSION=0.8.9
 
 RUN pip install --no-cache-dir uv==${UV_VERSION}
+RUN pip install jieba
 
 
 FROM base AS packages

@@ -159,11 +159,14 @@ class ElasticSearchVector(BaseVector):
     def add_texts(self, documents: list[Document], embeddings: list[list[float]], **kwargs):
         uuids = self._get_uuids(documents)
         for i in range(len(documents)):
+            query_tks = tokenizer.tokenize(documents[i].page_content)
+            page_content_str = " ".join(query_tks)
             self._client.index(
                 index=self._collection_name,
                 id=uuids[i],
                 document={
                     Field.CONTENT_KEY.value: documents[i].page_content,
+                    Field.CONTENT_KEY_TOKEN.value: page_content_str,
                     Field.VECTOR.value: embeddings[i] or None,
                     Field.METADATA_KEY.value: documents[i].metadata or {},
                 },
@@ -224,7 +227,10 @@ class ElasticSearchVector(BaseVector):
         return docs
 
     def search_by_full_text(self, query: str, **kwargs: Any) -> list[Document]:
-        query_str: dict[str, Any] = {"match": {Field.CONTENT_KEY.value: query}}
+        # query_str: dict[str, Any] = {"match": {Field.CONTENT_KEY.value: query}}
+        query_tks = tokenizer.tokenize(query)
+        page_content_str = " ".join(query_tks)
+        query_str = {"match": {Field.CONTENT_KEY_TOKEN.value: page_content_str}}
         document_ids_filter = kwargs.get("document_ids_filter")
 
         if document_ids_filter:
@@ -271,6 +277,7 @@ class ElasticSearchVector(BaseVector):
                 mappings = {
                     "properties": {
                         Field.CONTENT_KEY.value: {"type": "text"},
+                        Field.CONTENT_KEY_TOKEN.value: {"type": "text", "analyzer": "whitespace"},
                         Field.VECTOR.value: {  # Make sure the dimension is correct here
                             "type": "dense_vector",
                             "dims": dim,
